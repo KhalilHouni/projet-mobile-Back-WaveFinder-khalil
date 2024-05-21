@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -88,16 +87,9 @@ func getSpots(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Création d'une liste simplifiée pour l'affichage dans la liste iOS
-	var simplifiedList []map[string]interface{}
-	for _, record := range spots.Records {
-		simplifiedSpot := map[string]interface{}{
-			"surfBreak": strings.Join(record.Fields.SurfBreak, ", "),
-			"photos":    record.Fields.Photos,
-			"address":   record.Fields.Address,
-		}
-		simplifiedList = append(simplifiedList, simplifiedSpot)
-	}
+	// Création d'une liste simplifiée pour l'affichage dans la liste
+	var simplifiedList []SpotRecord
+	simplifiedList = append(simplifiedList, spots.Records...)
 
 	// Encodage de la liste simplifiée en JSON et envoi en réponse
 	w.Header().Set("Content-Type", "application/json")
@@ -105,6 +97,7 @@ func getSpots(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error encoding JSON response:", err)
 		http.Error(w, "Failed to encode JSON response", http.StatusInternalServerError)
 	}
+
 }
 
 func getOneSpot(w http.ResponseWriter, r *http.Request) {
@@ -151,6 +144,7 @@ func getOneSpot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Fonction pour rajouter un nouveau Post
 func addSpot(w http.ResponseWriter, r *http.Request) {
 	var newSpot SpotRecord
 
